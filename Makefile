@@ -12,6 +12,8 @@ help:
 	@echo "  clean        Clean build artifacts"
 	@echo "  data         Generate sample data"
 	@echo "  setup        Set up development environment"
+	@echo "  db-upload    Upload data to Supabase database"
+	@echo "  supabase-demo         Run Supabase client demo"
 
 # Installation
 install:
@@ -68,9 +70,15 @@ setup:
 	@echo "Virtual environment created. Activate with:"
 	@echo "source warehouse_env/bin/activate"
 
+supabase-demo:
+	python scripts/demo_supabase_client.py
+
 # Database
 db-setup:
 	python scripts/setup_database.py
+
+db-upload:
+	python scripts/upload_to_supabase.py
 
 db-migrate:
 	python scripts/migrate_database.py
