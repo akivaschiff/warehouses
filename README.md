@@ -12,7 +12,7 @@ This system models real-world warehouse trading operations where entities exchan
 - **FIFO Cost Accounting**: Calculate capital gains using First-In-First-Out methodology for different commodity types
 - **Seasonal Market Modeling**: Built-in seasonal pricing patterns for commodities like wheat, oil, steel, and cocoa
 - **Geographic Trade Flows**: Model real-world trade relationships between exporter and importer countries
-- **Multiple Commodity Types**: Support for interchangeable commodities, serialized items, and batched goods
+- **Multiple Commodity Types**: Support for bulk commodities, serialized items, and batched goods
 
 ## 🏗️ Project Structure
 
@@ -21,7 +21,8 @@ warehouse-exchange-system/
 ├── src/           # Main package
 │   ├── data_generation/       # Data generation modules
 │   ├── models/               # Data models (Exchange, Warehouse, Company)
-│   ├── analysis/             # FIFO calculator, profit analyzer
+│   ├── logic/                # Pure business logic (gains calculator)
+│   ├── flows/                # Orchestration layer
 │   └── database/             # Database schema and connections
 ├── tests/                    # Unit and integration tests
 ├── scripts/                  # Utility scripts
@@ -64,9 +65,8 @@ python -m src.data_generation.generator
 python scripts/run_analysis.py
 
 # Or run specific analysis
-from src.analysis import FIFOCalculator
-calculator = FIFOCalculator()
-profits = calculator.calculate_entity_profits('entity_id')
+from src.flows.warehouse_gains_flow import analyze_warehouse_gains
+report = analyze_warehouse_gains('warehouse_id')
 ```
 
 ## 📈 Data Model
@@ -79,7 +79,7 @@ profits = calculator.calculate_entity_profits('entity_id')
     "to_warehouse": "warehouse_id or 0x0000", 
     "brand_manufacturer": "Company Name",
     "item_type": "Wheat | Art | Electronics",
-    "commodity_standard": "interchangeable | serialized | batched",
+    "commodity_standard": "bulk | serialized | batched",
     "quantity": 100.5,
     "unit": "tons | pieces | barrels",
     "price_paid_usd": 25000.00,
@@ -91,7 +91,7 @@ profits = calculator.calculate_entity_profits('entity_id')
 
 ### Commodity Types
 
-1. **Interchangeable** (like ERC20): Wheat, oil, steel - divisible by weight/volume
+1. **Bulk** (like ERC20): Wheat, oil, steel - divisible by weight/volume
 2. **Serialized** (like NFT): Art, cars, equipment - unique items with IDs  
 3. **Batched** (like ERC1155): Limited editions - fungible within batch, unique across batches
 
@@ -134,7 +134,7 @@ pytest
 pytest --cov=src
 
 # Run specific test category
-pytest tests/test_analysis/
+pytest tests/test_models/
 ```
 
 ## 📚 Documentation

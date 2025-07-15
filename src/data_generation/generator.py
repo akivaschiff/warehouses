@@ -220,7 +220,7 @@ class WarehouseDataGenerator:
             'to_warehouse': to_warehouse,
             'brand_manufacturer': brand_manufacturer,
             'item_type': commodity.replace('_', ' ').title(),
-            'commodity_standard': 'interchangeable',
+            'commodity_standard': 'bulk',
             'quantity': quantity,
             'unit': unit,
             'price_paid_usd': round(total_price, 2),

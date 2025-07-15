@@ -1,7 +1,7 @@
 """
 Simple Warehouse Gains Calculator
 
-Chapter 0: Basic inflow/outflow analysis for interchangeable commodities only.
+Chapter 0: Basic inflow/outflow analysis for bulk commodities only.
 Pure business logic - no database dependencies.
 """
 

@@ -13,7 +13,7 @@ from enum import Enum
 
 class CommodityStandard(str, Enum):
     """Types of commodity standards supported"""
-    BULK = "bulk"  # Bulk commodities like wheat, oil, steel (formerly "interchangeable")
+    BULK = "bulk"  # Bulk commodities like wheat, oil, steel
 
 
 class Exchange(BaseModel):
@@ -85,11 +85,6 @@ class Exchange(BaseModel):
     def is_bulk(self) -> bool:
         """Check if this is a bulk commodity (wheat, oil, steel, etc.)"""
         return self.commodity_standard == CommodityStandard.BULK
-    
-    # Legacy methods for compatibility (will be removed in later chapters)
-    def is_interchangeable(self) -> bool:
-        """Legacy method - use is_bulk() instead"""
-        return self.is_bulk()
     
     def is_serialized(self) -> bool:
         """Not supported in Chapter 0"""

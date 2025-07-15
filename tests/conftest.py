@@ -10,7 +10,7 @@ def sample_exchange():
         "exchange_id": "test-123",
         "from_warehouse": "WH_A",
         "to_warehouse": "WH_B",
-        "commodity_standard": "interchangeable",
+        "commodity_standard": "bulk",
         "quantity": 100.0,
         "price_paid_usd": 5000.0
     }
