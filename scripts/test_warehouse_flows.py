@@ -8,6 +8,7 @@ data fetching, business logic, and result persistence.
 
 import sys
 import os
+import traceback
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -41,9 +42,8 @@ def test_new_flow_structure():
     if len(warehouses) == 0:
         print("❌ No warehouses found in database")
         return
-    
     # Test the flow with a sample warehouse
-    warehouse_id = warehouses.iloc[0]['warehouse_id']
+    warehouse_id = warehouses.iloc[0].get('warehouse_id')
     warehouse_country = warehouses.iloc[0].get('country', 'Unknown')
     
     print(f"\n🏭 Testing Flow with: {warehouse_id} ({warehouse_country})")
@@ -53,7 +53,8 @@ def test_new_flow_structure():
         # Use the new orchestration flow (simplified signature)
         report = analyze_warehouse_gains(
             warehouse_id=warehouse_id,
-            save_to_db=True  # This will show what would be saved
+            client=client,
+            save_to_db=False  # This will show what would be saved
         )
         
         # Display results
@@ -81,6 +82,8 @@ def test_new_flow_structure():
         print("⚠️ Business logic not implemented yet - this is expected for Chapter 0 setup")
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
+        print("Callstack:")
+        traceback.print_exc()
     
     print(f"\n" + "=" * 50)
     print("🎯 Flow structure test completed!")
