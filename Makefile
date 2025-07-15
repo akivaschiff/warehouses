@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test test-cov lint format type-check clean data setup test-flows test-full
+.PHONY: help install install-dev test test-cov lint format type-check clean data setup test-flows test-full test-mock test-demo
 
 # Default target
 help:
@@ -16,6 +16,8 @@ help:
 	@echo "  supabase-demo         Run Supabase client demo"
 	@echo "  test-flows   Test warehouse flows structure"
 	@echo "  test-full    Test complete end-to-end flow"
+	@echo "  test-mock    Test gains calculator with mocked data"
+	@echo "  test-demo    Demo two-exchange scenario"
 
 # Installation
 install:
@@ -90,6 +92,12 @@ test-flows:
 
 test-full:
 	python scripts/test_full_flow.py
+
+test-mock:
+	pytest tests/test_gains_calculator_mocked.py -v
+
+test-demo:
+	python scripts/test_two_exchange_demo.py
 
 # All quality checks
 check: lint type-check test
