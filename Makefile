@@ -14,6 +14,7 @@ help:
 	@echo "  setup        Set up development environment"
 	@echo "  db-upload    Upload data to Supabase database"
 	@echo "  supabase-demo         Run Supabase client demo"
+	@echo "  test-flows   Test warehouse flows structure"
 
 # Installation
 install:
@@ -82,6 +83,9 @@ db-upload:
 
 db-migrate:
 	python scripts/migrate_database.py
+
+test-flows:
+	python scripts/test_warehouse_flows.py
 
 # All quality checks
 check: lint type-check test
