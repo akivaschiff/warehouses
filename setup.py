@@ -56,8 +56,8 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "warehouse-generate=warehouse_system.data_generation.generator:main",
-            "warehouse-analyze=warehouse_system.analysis.profit_analyzer:main",
+            "warehouse-generate=src.data_generation.generator:main",
+            "warehouse-analyze=src.analysis.profit_analyzer:main",
         ],
     },
     include_package_data=True,

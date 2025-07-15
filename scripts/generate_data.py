@@ -8,7 +8,7 @@ import argparse
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from warehouse_system.data_generation.generator import WarehouseDataGenerator
+from src.data_generation.generator import WarehouseDataGenerator
 
 def main():
     parser = argparse.ArgumentParser(description='Generate warehouse exchange data')

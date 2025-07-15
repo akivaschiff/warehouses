@@ -18,7 +18,7 @@ This system models real-world warehouse trading operations where entities exchan
 
 ```
 warehouse-exchange-system/
-├── warehouse_system/           # Main package
+├── src/           # Main package
 │   ├── data_generation/       # Data generation modules
 │   ├── models/               # Data models (Exchange, Warehouse, Company)
 │   ├── analysis/             # FIFO calculator, profit analyzer
@@ -54,7 +54,7 @@ pip install -r requirements.txt
 python scripts/generate_data.py
 
 # Or use the main module
-python -m warehouse_system.data_generation.generator
+python -m src.data_generation.generator
 ```
 
 ### 3. Run Analysis
@@ -64,7 +64,7 @@ python -m warehouse_system.data_generation.generator
 python scripts/run_analysis.py
 
 # Or run specific analysis
-from warehouse_system.analysis import FIFOCalculator
+from src.analysis import FIFOCalculator
 calculator = FIFOCalculator()
 profits = calculator.calculate_entity_profits('entity_id')
 ```
@@ -131,7 +131,7 @@ Built-in seasonal pricing models based on real commodity markets:
 pytest
 
 # Run with coverage
-pytest --cov=warehouse_system
+pytest --cov=src
 
 # Run specific test category
 pytest tests/test_analysis/
@@ -148,13 +148,13 @@ pytest tests/test_analysis/
 ### Code Style
 ```bash
 # Format code
-black warehouse_system/
+black src/
 
 # Lint code  
-flake8 warehouse_system/
+flake8 src/
 
 # Type checking
-mypy warehouse_system/
+mypy src/
 ```
 
 ### Pre-commit Hooks

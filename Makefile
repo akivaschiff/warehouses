@@ -30,14 +30,14 @@ test:
 
 # Code quality
 lint:
-	flake8 warehouse_system/ tests/
+	flake8 src/ tests/
 
 format:
-	black warehouse_system/ tests/ scripts/
-	isort warehouse_system/ tests/ scripts/
+	black src/ tests/ scripts/
+	isort src/ tests/ scripts/
 
 type-check:
-	mypy warehouse_system/
+	mypy src/
 
 # Cleanup
 clean:

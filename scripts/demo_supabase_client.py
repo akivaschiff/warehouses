@@ -14,7 +14,7 @@ import os
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from warehouse_system.database.supabase_client import SupabaseClient
+from src.database.supabase_client import SupabaseClient
 import pandas as pd
 
 def main():

@@ -13,14 +13,14 @@ def create_directory_structure():
     """Create the complete project directory structure"""
     
     directories = [
-        "warehouse_system",
-        "warehouse_system/config",
-        "warehouse_system/data_generation", 
-        "warehouse_system/models",
-        "warehouse_system/analysis",
-        "warehouse_system/database",
-        "warehouse_system/database/migrations",
-        "warehouse_system/utils",
+        "src",
+        "src/config",
+        "src/data_generation", 
+        "src/models",
+        "src/analysis",
+        "src/database",
+        "src/database/migrations",
+        "src/utils",
         "tests",
         "tests/test_data_generation",
         "tests/test_analysis",
@@ -45,13 +45,13 @@ def create_init_files():
     """Create __init__.py files for Python packages"""
     
     init_files = [
-        "warehouse_system/__init__.py",
-        "warehouse_system/config/__init__.py",
-        "warehouse_system/data_generation/__init__.py",
-        "warehouse_system/models/__init__.py", 
-        "warehouse_system/analysis/__init__.py",
-        "warehouse_system/database/__init__.py",
-        "warehouse_system/utils/__init__.py",
+        "src/__init__.py",
+        "src/config/__init__.py",
+        "src/data_generation/__init__.py",
+        "src/models/__init__.py", 
+        "src/analysis/__init__.py",
+        "src/database/__init__.py",
+        "src/utils/__init__.py",
         "tests/__init__.py",
         "tests/test_data_generation/__init__.py",
         "tests/test_analysis/__init__.py",
@@ -66,13 +66,13 @@ def create_placeholder_files():
     """Create placeholder files with basic structure"""
     
     # Main module init
-    with open("warehouse_system/__init__.py", "w") as f:
+    with open("src/__init__.py", "w") as f:
         f.write('"""Warehouse Exchange System - An Etherscan for warehouses"""\n\n')
         f.write('__version__ = "0.1.0"\n')
         f.write('__author__ = "Workshop Organizer"\n')
     
     # Config settings
-    with open("warehouse_system/config/settings.py", "w") as f:
+    with open("src/config/settings.py", "w") as f:
         f.write('"""Configuration settings for the warehouse system"""\n\n')
         f.write('import os\n')
         f.write('from pathlib import Path\n\n')
@@ -102,10 +102,10 @@ def create_placeholder_files():
         f.write('    }\n')
     
     # Main entry point
-    with open("warehouse_system/main.py", "w") as f:
+    with open("src/main.py", "w") as f:
         f.write('"""Main entry point for the warehouse system"""\n\n')
         f.write('import click\n')
-        f.write('from warehouse_system.data_generation.generator import WarehouseDataGenerator\n\n')
+        f.write('from src.data_generation.generator import WarehouseDataGenerator\n\n')
         f.write('@click.command()\n')
         f.write('@click.option("--companies", default=100, help="Number of companies")\n')
         f.write('@click.option("--exchanges", default=50000, help="Number of exchanges")\n')
@@ -130,7 +130,7 @@ def create_sample_scripts():
         f.write('import sys\n')
         f.write('import os\n')
         f.write('sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n\n')
-        f.write('from warehouse_system.data_generation.generator import WarehouseDataGenerator\n\n')
+        f.write('from src.data_generation.generator import WarehouseDataGenerator\n\n')
         f.write('if __name__ == "__main__":\n')
         f.write('    generator = WarehouseDataGenerator()\n')
         f.write('    generator.generate_companies_and_warehouses(100)\n')
@@ -170,7 +170,7 @@ def main():
     
     print("\n✅ Project structure created successfully!")
     print("\nNext steps:")
-    print("1. Copy your warehouse data generator to: warehouse_system/data_generation/generator.py")
+    print("1. Copy your warehouse data generator to: src/data_generation/generator.py")
     print("2. Create virtual environment: python3 -m venv warehouse_env")
     print("3. Activate environment: source warehouse_env/bin/activate")
     print("4. Install dependencies: pip install -r requirements.txt")

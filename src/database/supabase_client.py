@@ -5,7 +5,7 @@ A simple Python client to interact with the warehouse data in Supabase.
 Perfect for workshop participants to query and analyze data.
 
 Usage Examples:
-    from warehouse_system.database.supabase_client import SupabaseClient
+    from src.database.supabase_client import SupabaseClient
     
     client = SupabaseClient()
     

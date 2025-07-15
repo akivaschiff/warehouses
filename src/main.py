@@ -1,7 +1,7 @@
 """Main entry point for the warehouse system"""
 
 import click
-from warehouse_system.data_generation.generator import WarehouseDataGenerator
+from src.data_generation.generator import WarehouseDataGenerator
 
 @click.command()
 @click.option("--companies", default=100, help="Number of companies")
