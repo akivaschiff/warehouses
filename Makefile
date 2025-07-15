@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test test-cov lint format type-check clean data setup docs
+.PHONY: help install install-dev test test-cov lint format type-check clean data setup test-flows test-full
 
 # Default target
 help:
@@ -15,6 +15,7 @@ help:
 	@echo "  db-upload    Upload data to Supabase database"
 	@echo "  supabase-demo         Run Supabase client demo"
 	@echo "  test-flows   Test warehouse flows structure"
+	@echo "  test-full    Test complete end-to-end flow"
 
 # Installation
 install:
@@ -86,6 +87,9 @@ db-migrate:
 
 test-flows:
 	python scripts/test_warehouse_flows.py
+
+test-full:
+	python scripts/test_full_flow.py
 
 # All quality checks
 check: lint type-check test

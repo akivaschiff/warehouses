@@ -54,7 +54,6 @@ def test_new_flow_structure():
         report = analyze_warehouse_gains(
             warehouse_id=warehouse_id,
             client=client,
-            save_to_db=False  # This will show what would be saved
         )
         
         # Display results
@@ -113,5 +112,5 @@ def show_environment_setup():
 
 
 if __name__ == "__main__":
-    test_new_flow_structure()
     show_environment_setup()
+    test_new_flow_structure()
