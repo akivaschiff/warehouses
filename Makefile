@@ -1,4 +1,4 @@
-.PHONY: help install install-dev test test-cov lint format type-check clean data setup test-flows test-full test-mock test-demo
+.PHONY: help install install-dev test test-cov lint format type-check clean data setup test-flows test-full test-mock test-demo tasks
 
 # Default target
 help:
@@ -18,6 +18,7 @@ help:
 	@echo "  test-full    Test complete end-to-end flow"
 	@echo "  test-mock    Test gains calculator with mocked data"
 	@echo "  test-demo    Demo two-exchange scenario"
+	@echo "  tasks        Show workshop tasks"
 
 # Installation
 install:
@@ -98,6 +99,17 @@ test-mock:
 
 test-demo:
 	python scripts/test_two_exchange_demo.py
+
+tasks:
+	@echo "📚 Workshop Tasks Available:"
+	@echo "  Task 1: Verify Warehouse Gains (30 min)"
+	@echo "  Task 2: Precise Daily Pricing (2-3 hours)"  
+	@echo "  Task 3: Add Serialized Items (2-4 hours)"
+	@echo "  Task 4: FIFO Capital Gains (4-6 hours)"
+	@echo "  Task 5: Entity Portfolio Analysis (4-8 hours)"
+	@echo ""
+	@echo "📖 See tasks/README.md for full details"
+	@echo "🚀 Start with: tasks/task_1_verify_warehouse_gains.md"
 
 # All quality checks
 check: lint type-check test
