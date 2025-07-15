@@ -8,6 +8,12 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
+
+
+class CommodityStandard(str, Enum):
+    """Types of commodity standards supported"""
+    BULK = "bulk"  # Bulk commodities like wheat, oil, steel (formerly "interchangeable")
 
 
 class Exchange(BaseModel):
@@ -22,15 +28,15 @@ class Exchange(BaseModel):
     to_warehouse: str = Field(..., description="Destination warehouse ID (or '0x0000' for burn)")
     brand_manufacturer: str = Field(..., description="Who creates/licenses the item")
     item_type: str = Field(..., description="Category: 'Wheat', 'Steel', 'Art', etc.")
-    commodity_standard: str = Field(..., description="'interchangeable', 'serialized', or 'batched'")
+    commodity_standard: CommodityStandard = Field(..., description="Type of commodity standard")
     quantity: Decimal = Field(..., description="Amount being transferred")
     unit: str = Field(..., description="'tons', 'gallons', 'pieces', etc.")
     price_paid_usd: Decimal = Field(..., description="USD amount exchanged")
     timestamp: datetime = Field(..., description="When exchange occurred")
     
-    # Optional fields for specific commodity types
-    batch_id: Optional[str] = Field(None, description="For batched items only")
-    item_ids: Optional[List[str]] = Field(None, description="For serialized items only")
+    # Optional fields for specific commodity types (future use)
+    batch_id: Optional[str] = Field(None, description="For batched items (future)")
+    item_ids: Optional[List[str]] = Field(None, description="For serialized items (future)")
     
     def is_inflow_for(self, warehouse_id: str) -> bool:
         """
@@ -76,17 +82,22 @@ class Exchange(BaseModel):
         """Check if this is a burn operation (stock leaving system)"""
         return self.to_warehouse == "0x0000"
     
+    def is_bulk(self) -> bool:
+        """Check if this is a bulk commodity (wheat, oil, steel, etc.)"""
+        return self.commodity_standard == CommodityStandard.BULK
+    
+    # Legacy methods for compatibility (will be removed in later chapters)
     def is_interchangeable(self) -> bool:
-        """Check if this is an interchangeable commodity"""
-        return self.commodity_standard == "interchangeable"
+        """Legacy method - use is_bulk() instead"""
+        return self.is_bulk()
     
     def is_serialized(self) -> bool:
-        """Check if this is a serialized item"""
-        return self.commodity_standard == "serialized"
+        """Not supported in Chapter 0"""
+        return False
     
     def is_batched(self) -> bool:
-        """Check if this is a batched item"""
-        return self.commodity_standard == "batched"
+        """Not supported in Chapter 0"""
+        return False
     
     class Config:
         """Pydantic configuration"""
@@ -105,7 +116,7 @@ class Exchange(BaseModel):
                 "to_warehouse": "WH_B67890",
                 "brand_manufacturer": "Cargill",
                 "item_type": "Wheat",
-                "commodity_standard": "interchangeable",
+                "commodity_standard": "bulk",
                 "quantity": "100.5",
                 "unit": "tons",
                 "price_paid_usd": "5025.00",

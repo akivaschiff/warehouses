@@ -6,14 +6,16 @@ Handles data fetching, business logic execution, and result persistence.
 """
 
 import os
-from typing import Optional, Iterator, Dict, Any
+from typing import Optional, Iterator
 from datetime import datetime
 from dotenv import load_dotenv
 import pandas as pd
+from decimal import Decimal
 
 from src.database.supabase_client import SupabaseClient
 from src.logic.gains_calculator import calculate_warehouse_gains
 from src.models.gain_report import GainReport
+from src.models.exchange import Exchange, CommodityStandard
 
 # Load environment variables
 load_dotenv()
@@ -29,8 +31,9 @@ def analyze_warehouse_gains(
     
     This is the main entry point that:
     1. Fetches all exchange data from database for the warehouse
-    2. Calls business logic to calculate gains
-    3. Optionally saves the report to database
+    2. Converts to Exchange objects
+    3. Calls business logic to calculate gains
+    4. Optionally saves the report to database
     
     Args:
         warehouse_id: The warehouse ID to analyze
@@ -53,11 +56,11 @@ def analyze_warehouse_gains(
     if len(warehouse_check) == 0:
         raise ValueError(f"Warehouse {warehouse_id} not found")
     
-    # Fetch ALL exchanges involving this warehouse (interchangeable commodities only)
+    # Fetch ALL exchanges involving this warehouse (bulk commodities only)
     all_exchanges = fetch_warehouse_exchanges(warehouse_id, client)
     
-    # Convert to iterator of exchange dictionaries
-    exchanges_iterator = exchanges_to_iterator(all_exchanges)
+    # Convert to iterator of Exchange objects
+    exchanges_iterator = dataframe_to_exchange_iterator(all_exchanges)
     
     # Call business logic to calculate gains
     report = calculate_warehouse_gains(
@@ -88,13 +91,13 @@ def fetch_warehouse_exchanges(warehouse_id: str, client: SupabaseClient) -> pd.D
     # Fetch INFLOWS (purchases) - money going OUT, commodities coming IN
     inflows = client.find('exchanges', {
         'to_warehouse': warehouse_id,
-        'commodity_standard': 'interchangeable'
+        'commodity_standard': 'bulk'
     })
     
     # Fetch OUTFLOWS (sales) - commodities going OUT, money coming IN  
     outflows = client.find('exchanges', {
         'from_warehouse': warehouse_id,
-        'commodity_standard': 'interchangeable'
+        'commodity_standard': 'bulk'
     })
     
     # Combine all exchanges
@@ -110,18 +113,34 @@ def fetch_warehouse_exchanges(warehouse_id: str, client: SupabaseClient) -> pd.D
     return all_exchanges
 
 
-def exchanges_to_iterator(exchanges_df: pd.DataFrame) -> Iterator[Dict[str, Any]]:
+def dataframe_to_exchange_iterator(exchanges_df: pd.DataFrame) -> Iterator[Exchange]:
     """
-    Convert DataFrame of exchanges to iterator of dictionaries.
+    Convert DataFrame of exchanges to iterator of Exchange objects.
     
     Args:
         exchanges_df: DataFrame with exchange data
         
     Returns:
-        Iterator yielding exchange dictionaries
+        Iterator yielding Exchange objects
     """
     for _, row in exchanges_df.iterrows():
-        yield row.to_dict()
+        # Convert DataFrame row to Exchange object
+        exchange_data = {
+            'exchange_id': row['exchange_id'],
+            'from_warehouse': row['from_warehouse'],
+            'to_warehouse': row['to_warehouse'],
+            'brand_manufacturer': row['brand_manufacturer'],
+            'item_type': row['item_type'],
+            'commodity_standard': CommodityStandard(row['commodity_standard']),  # Convert to enum
+            'quantity': Decimal(str(row['quantity'])),
+            'unit': row['unit'],
+            'price_paid_usd': Decimal(str(row['price_paid_usd'])),
+            'timestamp': pd.to_datetime(row['timestamp']),
+            'batch_id': row.get('batch_id'),
+            'item_ids': row.get('item_ids')
+        }
+        
+        yield Exchange(**exchange_data)
 
 
 def save_gain_report(report: GainReport, client: SupabaseClient) -> None:
