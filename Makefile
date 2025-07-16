@@ -3,25 +3,18 @@
 # Default target
 help:
 	@echo "Available commands:"
+	@echo "  setup        Set up development environment"
 	@echo "  install      Install production dependencies"
-	@echo "  install-dev  Install development dependencies"
+	@echo "  run-flow     Run warehouse main flow"
 	@echo "  test         Run tests"
 	@echo "  lint         Run flake8 linting"
 	@echo "  format       Format code with black"
 	@echo "  data         Generate sample data"
-	@echo "  setup        Set up development environment"
 	@echo "  db-upload    Upload data to Supabase database"
-	@echo "  supabase-demo         Run Supabase client demo"
-	@echo "  test-flow    Test warehouse main flow"
 
 # Installation
 install:
 	pip install -r requirements.txt
-
-install-dev:
-	pip install -r requirements.txt
-	pip install -e ".[dev]"
-	pre-commit install
 
 # Testing
 test:
@@ -55,9 +48,6 @@ setup:
 	@echo "Then run:"
 	@echo "pip install -r requirements.txt"
 
-supabase-demo:
-	python scripts/demo_supabase_client.py
-
 # Database
 db-setup:
 	python scripts/setup_database.py
@@ -65,10 +55,7 @@ db-setup:
 db-upload:
 	python scripts/upload_to_supabase.py
 
-db-migrate:
-	python scripts/migrate_database.py
-
-test-flow:
+run-flow:
 	python scripts/test_warehouse_flows.py
 
 # All quality checks
