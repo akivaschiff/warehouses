@@ -27,20 +27,7 @@ lint:
 format:
 	black src/ tests/ scripts/
 	isort src/ tests/ scripts/
-# Data generation
-data:
-	mkdir -p data/raw data/processed data/outputs
-	python scripts/generate_data.py
 
-data-small:
-	mkdir -p data/raw data/processed data/outputs
-	python scripts/generate_data.py --companies 20 --exchanges 5000
-
-data-large:
-	mkdir -p data/raw data/processed data/outputs
-	python scripts/generate_data.py --companies 500 --exchanges 1000000
-
-# Development setup
 setup:
 	python3 -m venv warehouse_env
 	@echo "Virtual environment created. Activate with:"
@@ -48,15 +35,12 @@ setup:
 	@echo "Then run:"
 	@echo "pip install -r requirements.txt"
 
-# Database
-db-setup:
-	python scripts/setup_database.py
+data:
+	mkdir -p data/raw data/processed data/outputs
+	python scripts/generate_data.py
 
 db-upload:
 	python scripts/upload_to_supabase.py
 
 run-flow:
 	python scripts/test_warehouse_flows.py
-
-# All quality checks
-check: lint type-check test
