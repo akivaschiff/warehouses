@@ -1,12 +1,5 @@
-"""
-Gain Report Models
-
-Data structures for representing simple inflow/outflow analysis results.
-Chapter 0: Basic gains calculation only.
-"""
-
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import List
 from datetime import datetime
 from decimal import Decimal
 
@@ -30,11 +23,9 @@ class GainReport:
     reporter_name: str
     analysis_date: datetime
 
-    # Main results: Outflow Value - Inflow Cost = Gain/Loss
     total_inflow_cost: Decimal  # Total money spent on purchases
     total_outflow_value: Decimal  # Total money received from sales
     total_gain_loss: Decimal  # total_outflow_value - total_inflow_cost
     total_transactions: int
 
-    # Breakdown by commodity type
     gains_by_commodity: List[CommodityGains]
