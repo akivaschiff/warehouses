@@ -36,7 +36,3 @@ class GainReport:
     
     # Breakdown by commodity type
     gains_by_commodity: List[CommodityGains]
-    
-    # Date range analyzed
-    analysis_start_date: Optional[datetime] = None
-    analysis_end_date: Optional[datetime] = None

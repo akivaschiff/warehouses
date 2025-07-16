@@ -1,11 +1,3 @@
-"""
-Simple Warehouse Gains Calculator
-
-Chapter 0: Basic inflow/outflow analysis for bulk commodities only.
-Pure business logic - no database dependencies.
-"""
-
-from typing import Iterator, Optional
 from datetime import datetime
 
 from src.models.gain_report import GainReport, CommodityGains
@@ -14,32 +6,10 @@ from src.models.exchange import Exchange
 
 def calculate_warehouse_gains(
     warehouse_id: str,
-    exchanges: Iterator[Exchange],
-    analysis_date: Optional[datetime] = None,
+    exchanges: list[Exchange],
+    analysis_date: datetime,
     reporter_name: str = "Unknown Reporter"
 ) -> GainReport:
-    """
-    Calculate simple inflow/outflow gains for a warehouse.
-    
-    Pure logic function - takes an iterator of Exchange objects, returns GainReport.
-    No database dependencies.
-    
-    Chapter 0 scope:
-    - Only bulk commodities (wheat, steel, oil, etc.)
-    - Simple calculation: total_outflow_value - total_inflow_cost = gain/loss
-    - Breakdown by commodity type (wheat vs steel vs oil)
-    - Analyzes entire time period (no date filtering)
-    
-    Args:
-        warehouse_id: The warehouse ID being analyzed
-        exchanges: Iterator of Exchange objects (both inflows and outflows)
-        analysis_date: When this analysis was performed
-        reporter_name: Who generated this report
-        
-    Returns:
-        GainReport: Simple gains analysis with inflow/outflow totals and 
-                   breakdown by commodity type
-    """
     from decimal import Decimal
     from collections import defaultdict
     
@@ -53,10 +23,6 @@ def calculate_warehouse_gains(
     commodity_outflows = defaultdict(Decimal)  # commodity -> total value
     commodity_transaction_counts = defaultdict(int)  # commodity -> count
     
-    # Track date range
-    earliest_date = None
-    latest_date = None
-    
     # Process all exchanges
     for exchange in exchanges:
         # Filter for bulk commodities only (Chapter 0 scope)
@@ -66,12 +32,6 @@ def calculate_warehouse_gains(
         # Check if this exchange involves our warehouse
         if not exchange.is_relevant_for(warehouse_id):
             continue
-            
-        # Track date range
-        if earliest_date is None or exchange.timestamp < earliest_date:
-            earliest_date = exchange.timestamp
-        if latest_date is None or exchange.timestamp > latest_date:
-            latest_date = exchange.timestamp
             
         # Determine if this is an inflow (purchase) or outflow (sale)
         if exchange.is_inflow_for(warehouse_id):
@@ -126,6 +86,4 @@ def calculate_warehouse_gains(
         total_gain_loss=total_gain_loss,
         total_transactions=total_transactions,
         gains_by_commodity=gains_by_commodity,
-        analysis_start_date=earliest_date,
-        analysis_end_date=latest_date
     )

@@ -88,7 +88,7 @@ class Exchange(BaseModel):
         use_enum_values = True
         
         # Example for documentation
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "exchange_id": "EX001",
                 "from_warehouse": "WH_A12345",

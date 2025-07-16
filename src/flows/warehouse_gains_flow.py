@@ -62,25 +62,4 @@ def _fetch_warehouse_exchanges(warehouse_id: str, client: SupabaseClient) -> Ite
     # Combine all exchanges
     all_exchanges = inflows + outflows
     
-    return _dict_list_to_exchange_iterator(all_exchanges)
-
-
-def _dict_list_to_exchange_iterator(exchanges_list: list) -> Iterator[Exchange]:
-
-    for exchange_dict in exchanges_list:
-        exchange_data = {
-            'exchange_id': exchange_dict['exchange_id'],
-            'from_warehouse': exchange_dict['from_warehouse'],
-            'to_warehouse': exchange_dict['to_warehouse'],
-            'brand_manufacturer': exchange_dict['brand_manufacturer'],
-            'item_type': exchange_dict['item_type'],
-            'commodity_standard': CommodityStandard(exchange_dict['commodity_standard']),  # Convert to enum
-            'quantity': Decimal(str(exchange_dict['quantity'])),
-            'unit': exchange_dict['unit'],
-            'price_paid_usd': Decimal(str(exchange_dict['price_paid_usd'])),
-            'timestamp': exchange_dict['timestamp'],  # Already a datetime object
-            'batch_id': exchange_dict.get('batch_id'),
-            'item_ids': exchange_dict.get('item_ids')
-        }
-        
-        yield Exchange(**exchange_data)
+    return [Exchange(**exchange_dict) for exchange_dict in all_exchanges]

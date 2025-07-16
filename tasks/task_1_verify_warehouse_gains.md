@@ -1,4 +1,4 @@
-# Task 1: Verify Warehouse Gains Calculation
+# Task 1: Complete the warehouse Gains Calculation
 
 ## Objective
 Run the existing gains calculation on a specific warehouse and verify the expected result.
