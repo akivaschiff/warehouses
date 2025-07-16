@@ -1,32 +1,7 @@
-"""
-Supabase Client for Warehouse Exchange System
-
-A simple Python client to interact with the warehouse data in Supabase.
-Perfect for workshop participants to query and analyze data.
-
-Usage Examples:
-    from src.database.supabase_client import SupabaseClient
-    
-    client = SupabaseClient()
-    
-    # List all tables
-    tables = client.list_tables()
-    
-    # Find all exchanges for wheat
-    wheat_trades = client.find('exchanges', {'item_type': 'Wheat'})
-    
-    # Find exchanges above $100k
-    big_trades = client.find('exchanges', {'price_paid_usd__gte': 100000})
-    
-    # Find companies from specific country
-    us_companies = client.find('companies', {'country': 'United States'})
-"""
-
 import os
-import pandas as pd
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
 import logging
 
@@ -35,9 +10,7 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-class SupabaseClient:
-    """Simple client for querying Supabase warehouse data"""
-    
+class SupabaseClient:    
     def __init__(self, database_url: Optional[str] = None):
         """
         Initialize Supabase client
@@ -63,17 +36,6 @@ class SupabaseClient:
             raise ConnectionError(f"Failed to connect to Supabase: {e}")
     
     def list_tables(self) -> List[str]:
-        """
-        List all tables in the database
-        
-        Returns:
-            List of table names
-        
-        Example:
-            >>> client = SupabaseClient()
-            >>> client.list_tables()
-            ['companies', 'warehouses', 'exchanges']
-        """
         try:
             inspector = inspect(self.engine)
             tables = inspector.get_table_names()
@@ -83,15 +45,6 @@ class SupabaseClient:
             return []
     
     def get_table_info(self, table_name: str) -> Dict[str, Any]:
-        """
-        Get information about a table (columns, types, etc.)
-        
-        Args:
-            table_name: Name of the table
-            
-        Returns:
-            Dictionary with table information
-        """
         try:
             inspector = inspect(self.engine)
             columns = inspector.get_columns(table_name)
@@ -120,7 +73,7 @@ class SupabaseClient:
         limit: Optional[int] = None,
         order_by: Optional[str] = None,
         order_desc: bool = False
-    ) -> pd.DataFrame:
+    ) -> List[Dict[str, Any]]:
         """
         Find records in a table with optional filters
         
@@ -139,7 +92,7 @@ class SupabaseClient:
             order_desc: If True, order in descending order
             
         Returns:
-            pandas DataFrame with results
+            List of dictionaries with results
             
         Examples:
             # Find all wheat exchanges
@@ -207,12 +160,13 @@ class SupabaseClient:
             # Execute query
             with self.engine.connect() as conn:
                 result = conn.execute(text(query), params)
-                df = pd.DataFrame(result.fetchall(), columns=result.keys())
-                return df
+                columns = result.keys()
+                rows = result.fetchall()
+                return [dict(zip(columns, row)) for row in rows]
                 
         except SQLAlchemyError as e:
             logger.error(f"Failed to query {table_name}: {e}")
-            return pd.DataFrame()
+            return []
     
     def count(self, table_name: str, filters: Optional[Dict[str, Any]] = None) -> int:
         """
@@ -261,7 +215,7 @@ class SupabaseClient:
             logger.error(f"Failed to count {table_name}: {e}")
             return 0
     
-    def execute_sql(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
+    def execute_sql(self, query: str, params: Optional[Dict] = None) -> List[Dict[str, Any]]:
         """
         Execute raw SQL query
         
@@ -270,7 +224,7 @@ class SupabaseClient:
             params: Optional parameters for the query
             
         Returns:
-            pandas DataFrame with results
+            List of dictionaries with results
             
         Example:
             >>> query = "SELECT item_type, COUNT(*) as count FROM exchanges GROUP BY item_type"
@@ -279,23 +233,14 @@ class SupabaseClient:
         try:
             with self.engine.connect() as conn:
                 result = conn.execute(text(query), params or {})
-                df = pd.DataFrame(result.fetchall(), columns=result.keys())
-                return df
+                columns = result.keys()
+                rows = result.fetchall()
+                return [dict(zip(columns, row)) for row in rows]
         except SQLAlchemyError as e:
             logger.error(f"Failed to execute query: {e}")
-            return pd.DataFrame()
+            return []
     
-    def get_sample_data(self, table_name: str, n: int = 5) -> pd.DataFrame:
-        """
-        Get sample records from a table
-        
-        Args:
-            table_name: Name of the table
-            n: Number of sample records
-            
-        Returns:
-            pandas DataFrame with sample data
-        """
+    def get_sample_data(self, table_name: str, n: int = 5) -> List[Dict[str, Any]]:
         return self.find(table_name, limit=n)
     
     def search_exchanges(
@@ -307,7 +252,7 @@ class SupabaseClient:
         end_date: Optional[str] = None,
         warehouse_id: Optional[str] = None,
         limit: int = 100
-    ) -> pd.DataFrame:
+    ) -> List[Dict[str, Any]]:
         """
         Specialized search for exchanges with common filters
         
@@ -321,7 +266,7 @@ class SupabaseClient:
             limit: Maximum results
             
         Returns:
-            pandas DataFrame with matching exchanges
+            List of dictionaries with matching exchanges
         """
         filters = {}
         
@@ -336,23 +281,22 @@ class SupabaseClient:
         if end_date:
             filters['timestamp__lte'] = end_date
         
-        df = self.find('exchanges', filters, limit=limit, order_by='timestamp', order_desc=True)
+        results = self.find('exchanges', filters, limit=limit, order_by='timestamp', order_desc=True)
         
         # Additional warehouse filter (from_warehouse OR to_warehouse)
-        if warehouse_id and len(df) > 0:
-            df = df[(df['from_warehouse'] == warehouse_id) | (df['to_warehouse'] == warehouse_id)]
+        if warehouse_id and results:
+            results = [
+                row for row in results 
+                if row.get('from_warehouse') == warehouse_id or row.get('to_warehouse') == warehouse_id
+            ]
         
-        return df
+        return results
 
 # Convenience functions for quick access
 def get_client() -> SupabaseClient:
     """Get a configured Supabase client"""
     return SupabaseClient()
 
-def quick_query(table_name: str, filters: Optional[Dict] = None, limit: int = 10) -> pd.DataFrame:
-    """Quick query function for interactive use"""
-    client = get_client()
-    return client.find(table_name, filters, limit=limit)
 
 # Example usage and testing
 if __name__ == "__main__":
@@ -364,15 +308,18 @@ if __name__ == "__main__":
     # Sample queries
     print("\n=== Sample Companies ===")
     companies = client.get_sample_data('companies', 3)
-    print(companies.to_string())
+    for company in companies:
+        print(company)
     
     print("\n=== Wheat Exchanges ===")
     wheat_trades = client.find('exchanges', {'item_type': 'Wheat'}, limit=5)
-    print(wheat_trades[['exchange_id', 'item_type', 'quantity', 'price_paid_usd', 'timestamp']].to_string())
+    for trade in wheat_trades:
+        print(f"ID: {trade['exchange_id']}, Type: {trade['item_type']}, Quantity: {trade['quantity']}, Price: {trade['price_paid_usd']}, Time: {trade['timestamp']}")
     
     print("\n=== High Value Exchanges ===")
     expensive_trades = client.find('exchanges', {'price_paid_usd__gte': 100000}, limit=5)
-    print(expensive_trades[['exchange_id', 'item_type', 'price_paid_usd']].to_string())
+    for trade in expensive_trades:
+        print(f"ID: {trade['exchange_id']}, Type: {trade['item_type']}, Price: {trade['price_paid_usd']}")
     
     print(f"\n=== Total Exchanges: {client.count('exchanges')} ===")
     print(f"Wheat exchanges: {client.count('exchanges', {'item_type': 'Wheat'})}")

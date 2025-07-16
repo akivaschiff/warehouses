@@ -27,16 +27,9 @@ def test_new_flow_structure():
     reporter = get_reporter_name()
     print(f"📊 Reporter Name: {reporter}")
     
-    # Initialize client
-    try:
-        client = SupabaseClient()
-        print("✅ Connected to database")
-    except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        return
-    
     # Get sample warehouses
     print("\n📋 Finding sample warehouses...")
+    client = SupabaseClient()
     warehouses = client.find('warehouses', limit=5)
     
     if len(warehouses) == 0:
@@ -94,8 +87,8 @@ def test_new_flow_structure():
     print(f"   • src/database/ = Data access layer")
 
 
-def show_environment_setup():
-    """Show what environment variables are expected"""
+def verify_env_setup():
+    """Verify environment setup and database connection"""
     
     print(f"\n🔧 Environment Setup:")
     print("=" * 30)
@@ -104,13 +97,37 @@ def show_environment_setup():
     reporter_name = os.getenv('REPORTER_NAME')
     
     print(f"DATABASE_URL: {'✅ Set' if database_url else '❌ Missing'}")
-    print(f"REPORTER_NAME: {'✅ Set' if reporter_name else '❌ Missing (will use default)'}")
+    print(f"REPORTER_NAME: {'✅ Set' if reporter_name else '❌ Missing'}")
     
+    # Check for missing required environment variables
+    missing_vars = []
+    if not database_url:
+        missing_vars.append('DATABASE_URL')
     if not reporter_name:
-        print(f"\n💡 To set reporter name, add to your .env file:")
-        print(f"   REPORTER_NAME=Your_Name_Here")
+        missing_vars.append('REPORTER_NAME')
+    
+    if missing_vars:
+        error_msg = f"Missing required environment variables: {', '.join(missing_vars)}"
+        print(f"\n❌ {error_msg}")
+        if 'REPORTER_NAME' in missing_vars:
+            print(f"\n💡 To set reporter name, add to your .env file:")
+            print(f"   REPORTER_NAME=Your_Name_Here")
+        raise EnvironmentError(error_msg)
+    
+    # Test database connection
+    try:
+        SupabaseClient()
+        print("✅ Database connection successful")
+    except Exception as e:
+        error_msg = f"Database connection failed: {e}"
+        print(f"\n❌ {error_msg}")
+        raise ConnectionError(error_msg)
 
 
 if __name__ == "__main__":
-    show_environment_setup()
-    test_new_flow_structure()
+    try:
+        verify_env_setup()
+        test_new_flow_structure()
+    except (EnvironmentError, ConnectionError) as e:
+        print(f"\n❌ Setup failed: {e}")
+        sys.exit(1)

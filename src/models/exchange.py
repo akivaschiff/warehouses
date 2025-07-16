@@ -73,27 +73,11 @@ class Exchange(BaseModel):
             True if this warehouse is either the source or destination
         """
         return self.is_inflow_for(warehouse_id) or self.is_outflow_for(warehouse_id)
-    
-    def is_mint(self) -> bool:
-        """Check if this is a mint operation (new stock entering system)"""
-        return self.from_warehouse == "0x0000"
-    
-    def is_burn(self) -> bool:
-        """Check if this is a burn operation (stock leaving system)"""
-        return self.to_warehouse == "0x0000"
-    
+        
     def is_bulk(self) -> bool:
         """Check if this is a bulk commodity (wheat, oil, steel, etc.)"""
         return self.commodity_standard == CommodityStandard.BULK
-    
-    def is_serialized(self) -> bool:
-        """Not supported in Chapter 0"""
-        return False
-    
-    def is_batched(self) -> bool:
-        """Not supported in Chapter 0"""
-        return False
-    
+        
     class Config:
         """Pydantic configuration"""
         # Allow using Decimal types
