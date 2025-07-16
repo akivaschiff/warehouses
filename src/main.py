@@ -3,6 +3,7 @@
 import click
 from src.data_generation.generator import WarehouseDataGenerator
 
+
 @click.command()
 @click.option("--companies", default=100, help="Number of companies")
 @click.option("--exchanges", default=50000, help="Number of exchanges")
@@ -12,6 +13,7 @@ def main(companies, exchanges):
     generator.generate_companies_and_warehouses(companies)
     generator.generate_exchanges(exchanges)
     generator.save_to_csv()
+
 
 if __name__ == "__main__":
     main()

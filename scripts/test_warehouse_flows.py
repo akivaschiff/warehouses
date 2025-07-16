@@ -20,28 +20,28 @@ from src.database.supabase_client import SupabaseClient
 
 def test_new_flow_structure(warehouse_id: str):
     """Test the new flows/logic separation"""
-    
+
     print("🏗️ Testing New Flow Structure")
     print("=" * 50)
-    
+
     # Test reporter name from environment
     reporter = get_reporter_name()
     print(f"📊 Reporter Name: {reporter}")
-    
+
     # Get sample warehouses
     print("📋 Finding sample warehouses...")
     client = SupabaseClient()
 
     print(f"🏭 Testing Flow with: {warehouse_id}")
     print("=" * 50)
-    
+
     try:
         # Use the new orchestration flow (simplified signature)
         report = analyze_warehouse_gains(
             warehouse_id=warehouse_id,
             client=client,
         )
-        
+
         # Display results
         print(f"📊 Flow Results:")
         print(f"   Warehouse: {report.warehouse_id}")
@@ -52,29 +52,26 @@ def test_new_flow_structure(warehouse_id: str):
         print(f"   Total Outflow Value: ${report.total_outflow_value:,.2f}")
         print(f"   Total Gain/Loss: ${report.total_gain_loss:,.2f}")
         print(f"   Commodity Breakdown: {len(report.gains_by_commodity)} types")
-        
+
         # Show commodity breakdown
         for commodity in report.gains_by_commodity:
-            print(f"     • {commodity.commodity_type}: ${commodity.total_gain_loss:,.2f} ({commodity.number_of_transactions} transactions)")
-    
+            print(
+                f"     • {commodity.commodity_type}: ${commodity.total_gain_loss:,.2f} ({commodity.number_of_transactions} transactions)"
+            )
+
     except ValueError as e:
         print(f"❌ Validation Error: {e}")
     except NotImplementedError:
-        print("⚠️ Business logic not implemented yet - this is expected for Chapter 0 setup")
+        print(
+            "⚠️ Business logic not implemented yet - this is expected for Chapter 0 setup"
+        )
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
         print("Callstack:")
         traceback.print_exc()
-    
+
     print(f"\n" + "=" * 50)
     print("🎯 Flow structure test completed!")
-    
-    print(f"\n💡 Architecture Notes:")
-    print(f"   • src/flows/ = Orchestration layer (DB fetch → logic → DB save)")
-    print(f"   • src/logic/ = Pure business logic (no DB dependencies)")
-    print(f"   • src/models/ = Data structures")
-    print(f"   • src/database/ = Data access layer")
-
 
 
 if __name__ == "__main__":

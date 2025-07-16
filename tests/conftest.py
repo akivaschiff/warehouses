@@ -3,6 +3,7 @@
 import pytest
 import pandas as pd
 
+
 @pytest.fixture
 def sample_exchange():
     """Sample exchange for testing"""
@@ -12,5 +13,5 @@ def sample_exchange():
         "to_warehouse": "WH_B",
         "commodity_standard": "bulk",
         "quantity": 100.0,
-        "price_paid_usd": 5000.0
+        "price_paid_usd": 5000.0,
     }
