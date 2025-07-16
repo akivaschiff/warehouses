@@ -1,9 +1,3 @@
-"""
-Exchange Model
-
-Pydantic model representing a warehouse exchange transaction.
-"""
-
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
@@ -17,62 +11,15 @@ class CommodityStandard(str, Enum):
 
 class Exchange(BaseModel):
     exchange_id: str = Field(..., description="Unique identifier for this exchange")
-    from_warehouse: str = Field(
-        ..., description="Source warehouse ID (or '0x0000' for mint)"
-    )
-    to_warehouse: str = Field(
-        ..., description="Destination warehouse ID (or '0x0000' for burn)"
-    )
+    from_warehouse: str = Field(..., description="Source warehouse ID")
+    to_warehouse: str = Field(..., description="Destination warehouse ID")
     brand_manufacturer: str = Field(..., description="Who creates/licenses the item")
     item_type: str = Field(..., description="Category: 'Wheat', 'Steel', 'Art', etc.")
-    commodity_standard: CommodityStandard = Field(
-        ..., description="Type of commodity standard"
-    )
+    commodity_standard: CommodityStandard = Field(..., description="Type of commodity standard")
     quantity: Decimal = Field(..., description="Amount being transferred")
     unit: str = Field(..., description="'tons', 'gallons', 'pieces', etc.")
     price_paid_usd: Decimal = Field(..., description="USD amount exchanged")
     timestamp: datetime = Field(..., description="When exchange occurred")
-
-    def is_inflow_for(self, warehouse_id: str) -> bool:
-        """
-        Check if this exchange is an inflow (purchase) for the given warehouse.
-
-        Args:
-            warehouse_id: The warehouse to check against
-
-        Returns:
-            True if this is money going out, commodities coming in
-        """
-        return self.to_warehouse == warehouse_id
-
-    def is_outflow_for(self, warehouse_id: str) -> bool:
-        """
-        Check if this exchange is an outflow (sale) for the given warehouse.
-
-        Args:
-            warehouse_id: The warehouse to check against
-
-        Returns:
-            True if this is commodities going out, money coming in
-        """
-        return self.from_warehouse == warehouse_id
-
-    def is_relevant_for(self, warehouse_id: str) -> bool:
-        """
-        Check if this exchange involves the given warehouse.
-
-        Args:
-            warehouse_id: The warehouse to check against
-
-        Returns:
-            True if this warehouse is either the source or destination
-        """
-        return self.is_inflow_for(warehouse_id) or self.is_outflow_for(warehouse_id)
-
-    def is_bulk(self) -> bool:
-        """Check if this is a bulk commodity (wheat, oil, steel, etc.)"""
-        return self.commodity_standard == CommodityStandard.BULK
-
     class Config:
         """Pydantic configuration"""
 
@@ -96,7 +43,5 @@ class Exchange(BaseModel):
                 "unit": "tons",
                 "price_paid_usd": "5025.00",
                 "timestamp": "2023-06-15T10:30:00Z",
-                "batch_id": None,
-                "item_ids": None,
             }
         }

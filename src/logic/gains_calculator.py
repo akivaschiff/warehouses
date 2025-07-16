@@ -25,14 +25,6 @@ def calculate_warehouse_gains(
 
     # Process all exchanges
     for exchange in exchanges:
-        # Filter for bulk commodities only (Chapter 0 scope)
-        if not exchange.is_bulk():
-            continue
-
-        # Check if this exchange involves our warehouse
-        if not exchange.is_relevant_for(warehouse_id):
-            continue
-
         # Determine if this is an inflow (purchase) or outflow (sale)
         if exchange.is_inflow_for(warehouse_id):
             # INFLOW: Money going OUT, commodities coming IN
