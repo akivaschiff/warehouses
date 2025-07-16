@@ -12,18 +12,10 @@ from enum import Enum
 
 
 class CommodityStandard(str, Enum):
-    """Types of commodity standards supported"""
-
     BULK = "bulk"  # Bulk commodities like wheat, oil, steel
 
 
 class Exchange(BaseModel):
-    """
-    A warehouse exchange transaction.
-
-    Represents the transfer of money for moving resources/items between warehouses.
-    """
-
     exchange_id: str = Field(..., description="Unique identifier for this exchange")
     from_warehouse: str = Field(
         ..., description="Source warehouse ID (or '0x0000' for mint)"
@@ -40,12 +32,6 @@ class Exchange(BaseModel):
     unit: str = Field(..., description="'tons', 'gallons', 'pieces', etc.")
     price_paid_usd: Decimal = Field(..., description="USD amount exchanged")
     timestamp: datetime = Field(..., description="When exchange occurred")
-
-    # Optional fields for specific commodity types (future use)
-    batch_id: Optional[str] = Field(None, description="For batched items (future)")
-    item_ids: Optional[List[str]] = Field(
-        None, description="For serialized items (future)"
-    )
 
     def is_inflow_for(self, warehouse_id: str) -> bool:
         """
