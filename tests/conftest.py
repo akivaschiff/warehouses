@@ -1,7 +1,6 @@
 """Pytest configuration and fixtures"""
 
 import pytest
-import pandas as pd
 
 
 @pytest.fixture

@@ -52,6 +52,8 @@ setup:
 	python3 -m venv warehouse_env
 	@echo "Virtual environment created. Activate with:"
 	@echo "source warehouse_env/bin/activate"
+	@echo "Then run:"
+	@echo "pip install -r requirements.txt"
 
 supabase-demo:
 	python scripts/demo_supabase_client.py

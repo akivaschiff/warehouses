@@ -1,4 +1,6 @@
-# Task 1: Complete the warehouse Gains Calculation
+# Task 1: The warehouse gain report
+
+Every warehouse should be able to produce a report summarizing the total value that went through it. An "inflow" is the cost we pay to bring commodities into the warehouse and the "outflow" is the money we make from selling it out. The "gain" is the difference between these two numbers and is hopefully a positive one (but don't worry if it isn't - warehouses have more magic up their sleeves).
 
 ## Objective
 Run the existing gains calculation on a specific warehouse and verify the expected result.
