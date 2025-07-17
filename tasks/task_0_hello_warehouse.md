@@ -11,4 +11,4 @@ Let's begin my making sure our setup is good and the flow runs:
 # Test flow and connection
 make run-flow
 ```
-Don't worry if you see alot of "0"-s. We'll fix that right away. The password to your first quest is "Ph@s3V"
+Don't worry if you see alot of "0"-s. We'll fix that right away. The password to your first quest is `Ph@s3V`.

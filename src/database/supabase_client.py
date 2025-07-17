@@ -218,33 +218,6 @@ class SupabaseClient:
             logger.error(f"Failed to count {table_name}: {e}")
             return 0
 
-    def execute_sql(
-        self, query: str, params: Optional[Dict] = None
-    ) -> List[Dict[str, Any]]:
-        """
-        Execute raw SQL query
-
-        Args:
-            query: SQL query string
-            params: Optional parameters for the query
-
-        Returns:
-            List of dictionaries with results
-
-        Example:
-            >>> query = "SELECT item_type, COUNT(*) as count FROM exchanges GROUP BY item_type"
-            >>> client.execute_sql(query)
-        """
-        try:
-            with self.engine.connect() as conn:
-                result = conn.execute(text(query), params or {})
-                columns = result.keys()
-                rows = result.fetchall()
-                return [dict(zip(columns, row)) for row in rows]
-        except SQLAlchemyError as e:
-            logger.error(f"Failed to execute query: {e}")
-            return []
-
     def get_sample_data(self, table_name: str, n: int = 5) -> List[Dict[str, Any]]:
         return self.find(table_name, limit=n)
 
