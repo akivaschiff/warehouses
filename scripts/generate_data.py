@@ -22,12 +22,19 @@ def main():
     parser.add_argument(
         "--output", default="data/outputs/warehouse_data", help="Output file prefix"
     )
+    parser.add_argument(
+        "--skip-prices", action="store_true", help="Skip commodity price generation"
+    )
 
     args = parser.parse_args()
 
     generator = WarehouseDataGenerator()
     generator.generate_companies_and_warehouses(args.companies)
     generator.generate_exchanges(args.exchanges)
+    
+    if not args.skip_prices:
+        generator.generate_commodity_prices()
+    
     generator.save_to_csv(args.output)
 
 

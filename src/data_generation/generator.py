@@ -252,6 +252,7 @@ class WarehouseDataGenerator:
         self.warehouses = []
         self.companies = []
         self.exchanges = []
+        self.commodity_prices = []
 
     def generate_companies_and_warehouses(self, num_companies=50):
         """Generate realistic companies and their warehouses"""
@@ -488,24 +489,100 @@ class WarehouseDataGenerator:
 
         print(f"Generated {len(self.exchanges)} total exchanges!")
 
+    def generate_commodity_prices(self):
+        """Generate daily commodity prices with realistic fluctuation patterns"""
+        print("Generating daily commodity prices...")
+        
+        # Generate date range
+        date_range = pd.date_range(self.start_date, self.end_date, freq='D')
+        
+        for commodity_key, pattern in COMMODITY_PATTERNS.items():
+            print(f"Generating prices for {commodity_key}...")
+            
+            commodity_name = commodity_key.replace('_', ' ').title()
+            base_price = pattern['base_price']
+            seasonal_multipliers = pattern['seasonal_multipliers']
+            volatility = pattern['volatility']
+            
+            # Get unit
+            if commodity_key == 'crude_oil':
+                unit = 'barrels'
+            else:
+                unit = 'tons'
+            
+            # Initialize price tracking
+            current_shock_factor = 1.0  # For persistent shocks
+            momentum = 0.0  # Price momentum
+            
+            for date in date_range:
+                # 1. Calculate seasonal baseline
+                month = date.month
+                seasonal_base = seasonal_multipliers[month - 1]
+                seasonal_price = base_price * seasonal_base
+                
+                # 2. Add random walk momentum (prices tend to continue direction)
+                momentum_decay = 0.95  # Momentum fades over time
+                momentum *= momentum_decay
+                momentum += random.uniform(-0.02, 0.02)  # Small daily momentum changes
+                momentum = max(-0.15, min(0.15, momentum))  # Cap momentum
+                
+                # 3. Add daily volatility (smaller than exchange-level volatility)
+                daily_volatility = volatility * 0.3  # Daily vol is smaller than full period vol
+                daily_change = random.uniform(-daily_volatility, daily_volatility)
+                
+                # 4. Occasional shock events (5% chance of larger move)
+                if random.random() < 0.05:
+                    shock = random.uniform(-0.15, 0.15)  # ±15% shock
+                    current_shock_factor *= (1 + shock)
+                    # Shocks persist but decay
+                    current_shock_factor = 0.98 * current_shock_factor + 0.02 * 1.0
+                
+                # 5. Calculate final price
+                price_multiplier = (
+                    seasonal_base *          # Seasonal pattern
+                    (1 + momentum) *         # Momentum
+                    (1 + daily_change) *     # Daily volatility
+                    current_shock_factor     # Shock factor
+                )
+                
+                final_price = base_price * price_multiplier
+                
+                # Ensure price stays within reasonable bounds
+                min_price = base_price * 0.3
+                max_price = base_price * 3.0
+                final_price = max(min_price, min(max_price, final_price))
+                
+                # Add to commodity prices
+                self.commodity_prices.append({
+                    'date': date.date(),
+                    'commodity_type': commodity_name,
+                    'price_per_unit': round(final_price, 2),
+                    'unit': unit,
+                    'commodity_key': commodity_key  # For reference
+                })
+        
+        print(f"Generated {len(self.commodity_prices)} daily price records!")
+
     def to_dataframes(self):
         """Convert to pandas DataFrames"""
         companies_df = pd.DataFrame(self.companies)
         warehouses_df = pd.DataFrame(self.warehouses)
         exchanges_df = pd.DataFrame(self.exchanges)
+        commodity_prices_df = pd.DataFrame(self.commodity_prices)
 
-        return companies_df, warehouses_df, exchanges_df
+        return companies_df, warehouses_df, exchanges_df, commodity_prices_df
 
     def save_to_csv(self, prefix="warehouse_data"):
         """Save all data to CSV files"""
-        companies_df, warehouses_df, exchanges_df = self.to_dataframes()
+        companies_df, warehouses_df, exchanges_df, commodity_prices_df = self.to_dataframes()
 
         companies_df.to_csv(f"{prefix}_companies.csv", index=False)
         warehouses_df.to_csv(f"{prefix}_warehouses.csv", index=False)
         exchanges_df.to_csv(f"{prefix}_exchanges.csv", index=False)
+        commodity_prices_df.to_csv(f"{prefix}_commodity_prices.csv", index=False)
 
         print(
-            f"Saved {len(companies_df)} companies, {len(warehouses_df)} warehouses, {len(exchanges_df)} exchanges"
+            f"Saved {len(companies_df)} companies, {len(warehouses_df)} warehouses, {len(exchanges_df)} exchanges, {len(commodity_prices_df)} price records"
         )
 
 
@@ -518,17 +595,21 @@ if __name__ == "__main__":
 
     # Generate exchanges (start small for testing)
     generator.generate_exchanges(num_exchanges=50000)
+    
+    # Generate commodity prices
+    generator.generate_commodity_prices()
 
     # Save to files
     generator.save_to_csv()
 
     # Quick analysis
-    companies_df, warehouses_df, exchanges_df = generator.to_dataframes()
+    companies_df, warehouses_df, exchanges_df, commodity_prices_df = generator.to_dataframes()
 
     print("\n=== Data Summary ===")
     print(f"Companies: {len(companies_df)}")
     print(f"Warehouses: {len(warehouses_df)}")
     print(f"Exchanges: {len(exchanges_df)}")
+    print(f"Price Records: {len(commodity_prices_df)}")
     print(
         f"Date range: {exchanges_df['timestamp'].min()} to {exchanges_df['timestamp'].max()}"
     )
@@ -552,6 +633,18 @@ if __name__ == "__main__":
         for month, price in monthly_avg.items():
             print(f"Month {month:2d}: ${price:6.2f}")
 
+    print("\n=== Commodity Prices Sample ===")
+    if len(commodity_prices_df) > 0:
+        # Show price range for each commodity
+        price_summary = commodity_prices_df.groupby('commodity_type')['price_per_unit'].agg(['min', 'max', 'mean']).round(2)
+        print("Price ranges by commodity:")
+        print(price_summary.to_string())
+        
+        print("\nSample wheat prices (first 10 days):")
+        wheat_sample = commodity_prices_df[commodity_prices_df['commodity_type'] == 'Wheat'].head(10)
+        for _, row in wheat_sample.iterrows():
+            print(f"{row['date']}: ${row['price_per_unit']:6.2f}/{row['unit']}")
+    
     print("\n=== Geographic Trade Flow Analysis ===")
     trades_by_country = warehouses_df.merge(
         exchanges_df, left_on="warehouse_id", right_on="from_warehouse"

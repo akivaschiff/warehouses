@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 def load_csv_files():
     """Load the generated CSV files"""
     data_files = {
+        "commodity_prices": "data/outputs/warehouse_data_commodity_prices.csv",
         "companies": "data/outputs/warehouse_data_companies.csv",
         "warehouses": "data/outputs/warehouse_data_warehouses.csv",
         "exchanges": "data/outputs/warehouse_data_exchanges.csv",
@@ -99,7 +100,7 @@ def upload_data_to_supabase(engine, dataframes):
     """Upload dataframes to Supabase tables"""
 
     # Upload order matters due to foreign key relationships
-    upload_order = ["companies", "warehouses", "exchanges"]
+    upload_order = ["commodity_prices", "companies", "warehouses", "exchanges"]
 
     for table_name in upload_order:
         df = dataframes[table_name]
