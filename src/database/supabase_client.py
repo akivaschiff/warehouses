@@ -221,60 +221,6 @@ class SupabaseClient:
     def get_sample_data(self, table_name: str, n: int = 5) -> List[Dict[str, Any]]:
         return self.find(table_name, limit=n)
 
-    def search_exchanges(
-        self,
-        commodity_type: Optional[str] = None,
-        min_price: Optional[float] = None,
-        max_price: Optional[float] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        warehouse_id: Optional[str] = None,
-        limit: int = 100,
-    ) -> List[Dict[str, Any]]:
-        """
-        Specialized search for exchanges with common filters
-
-        Args:
-            commodity_type: Filter by item_type (e.g., 'Wheat', 'Steel')
-            min_price: Minimum price_paid_usd
-            max_price: Maximum price_paid_usd
-            start_date: Start date (YYYY-MM-DD format)
-            end_date: End date (YYYY-MM-DD format)
-            warehouse_id: Filter by from_warehouse or to_warehouse
-            limit: Maximum results
-
-        Returns:
-            List of dictionaries with matching exchanges
-        """
-        filters = {}
-
-        if commodity_type:
-            filters["item_type"] = commodity_type
-        if min_price is not None:
-            filters["price_paid_usd__gte"] = min_price
-        if max_price is not None:
-            filters["price_paid_usd__lte"] = max_price
-        if start_date:
-            filters["timestamp__gte"] = start_date
-        if end_date:
-            filters["timestamp__lte"] = end_date
-
-        results = self.find(
-            "exchanges", filters, limit=limit, order_by="timestamp", order_desc=True
-        )
-
-        # Additional warehouse filter (from_warehouse OR to_warehouse)
-        if warehouse_id and results:
-            results = [
-                row
-                for row in results
-                if row.get("from_warehouse") == warehouse_id
-                or row.get("to_warehouse") == warehouse_id
-            ]
-
-        return results
-
-
 # Convenience functions for quick access
 def get_client() -> SupabaseClient:
     """Get a configured Supabase client"""
