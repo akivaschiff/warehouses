@@ -8,9 +8,8 @@ In the `src/flows/warehouse_gains_flow.py` Load also the price rows.
 Replace exchange pricing with accurate daily prices from the `commodity_prices` table.
 When you're ready, just re-run our flow on warehouse `"WH_30f6fae4"` using:
 
-
 ```bash
 make run-flow
 ```
 
-To contineu - you must answer the questio - what is the `Total Gain/Loss` now?
+To continue - you must answer the question - what is the `Total Gain/Loss` now?
