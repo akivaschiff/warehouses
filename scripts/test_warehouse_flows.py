@@ -19,20 +19,18 @@ from src.database.supabase_client import SupabaseClient
 
 
 def test_new_flow_structure(warehouse_id: str):
-    """Test the new flows/logic separation"""
 
-    print("🏗️ Testing New Flow Structure")
+    print("=" * 50)
+    print("🏗️ Testing main Flow")
     print("=" * 50)
 
     # Test reporter name from environment
     reporter = get_reporter_name()
     print(f"📊 Reporter Name: {reporter}")
 
-    # Get sample warehouses
-    print("📋 Finding sample warehouses...")
     client = SupabaseClient()
 
-    print(f"🏭 Testing Flow with: {warehouse_id}")
+    print(f"🏭 Running Flow with: {warehouse_id}")
     print("=" * 50)
 
     try:
@@ -63,7 +61,7 @@ def test_new_flow_structure(warehouse_id: str):
         print(f"❌ Validation Error: {e}")
     except NotImplementedError:
         print(
-            "⚠️ Business logic not implemented yet - this is expected for Chapter 0 setup"
+            "⚠️ Business logic not implemented yet - this is expected!"
         )
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
@@ -71,7 +69,7 @@ def test_new_flow_structure(warehouse_id: str):
         traceback.print_exc()
 
     print(f"\n" + "=" * 50)
-    print("🎯 Flow structure test completed!")
+    print("🎯 Flow run completed!")
 
 
 if __name__ == "__main__":
