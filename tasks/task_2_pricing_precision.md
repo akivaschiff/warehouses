@@ -1,100 +1,43 @@
-# Task 2: Implement Precise Daily Pricing
-
-## Objective
-Replace the current monthly-average pricing with precise daily prices from dedicated price tables.
+# Task 2: Precise Daily Pricing
 
 ## Background
-Currently, commodity prices use seasonal/monthly averages. The database contains daily price tables (`prices_wheat`, `prices_steel`, etc.) with exact historical prices. We need to join exchange data with these precise prices for accurate calculations.
+Currently, each exchange record contains its own `price_paid_usd` value. However, this value is innacurate. The database now contains a `commodity_prices` table with precise daily rates for each commodity per unit.
 
-## Database Schema
-Price tables follow this structure:
-```sql
--- Example: prices_wheat table
-CREATE TABLE prices_wheat (
-    date DATE,
-    price_per_unit DECIMAL(10,2),  -- USD per ton/barrel/etc
-    commodity_type VARCHAR(50),
-    region VARCHAR(100)
-);
+
+## Objective
+Load the exchange rows and the price rows 
+Replace exchange pricing with accurate daily prices from the `commodity_prices` table.
+
+
+## Table Structure
+```csv
+date,commodity_type,price_per_unit,unit
+2024-01-01,Wheat,285.43,tons
+2024-01-01,Steel,540.12,tons
+...
 ```
 
 ## Instructions
 
-### 1. Explore Price Tables
-First, examine the available price data:
+1. **Update `fetch_warehouse_exchanges()`** in `src/flows/warehouse_gains_flow.py`
+2. **Join exchanges with commodity_prices** on:
+   - `DATE(exchange.timestamp)` = `commodity_prices.date`  
+   - `exchange.item_type` = `commodity_prices.commodity_type`
+3. **Calculate new price**: `quantity * price_per_unit`
+4. **Use original price as fallback** if no match found
 
-```python
-from src.database.supabase_client import SupabaseClient
+## Test Results
+Run the same warehouse and compare:
 
-client = SupabaseClient()
-
-# Check available price tables
-tables = client.list_tables()
-price_tables = [t for t in tables if t.startswith('prices_')]
-print("Price tables:", price_tables)
-
-# Sample wheat prices
-wheat_prices = client.find('prices_wheat', limit=10)
-print(wheat_prices)
+```bash
+make run-flow
 ```
 
-### 2. Modify Exchange Data Loading
-Update `src/flows/warehouse_gains_flow.py`:
-
-**In `fetch_warehouse_exchanges()` function:**
-- Join exchanges with appropriate price tables
-- Match on: `exchange.timestamp` → `prices.date` and `exchange.item_type` → `prices.commodity_type`
-- Replace `exchange.price_paid_usd` with `(exchange.quantity * prices.price_per_unit)`
-
-### 3. Handle Missing Prices
-For exchanges without matching price data:
-- Use the original `price_paid_usd` as fallback
-- Log a warning about missing price data
-- Track how many exchanges used fallback pricing
-
-### 4. Update SQL Query Example
-```sql
--- Join exchanges with wheat prices
-SELECT 
-    e.*,
-    p.price_per_unit,
-    (e.quantity * p.price_per_unit) as calculated_price,
-    CASE 
-        WHEN p.price_per_unit IS NULL THEN e.price_paid_usd
-        ELSE (e.quantity * p.price_per_unit)
-    END as updated_price
-FROM exchanges e
-LEFT JOIN prices_wheat p ON DATE(e.timestamp) = p.date 
-    AND e.item_type = p.commodity_type
-WHERE e.commodity_standard = 'bulk'
-```
-
-### 5. Re-run Analysis
-Test on the same warehouse `WH_c979f0a5`:
-```python
-report = analyze_warehouse_gains("WH_c979f0a5")
-print(f"Updated Total Gain: ${report.total_gain_loss:,.2f}")
-```
-
-## Expected Changes
-- **More accurate pricing** reflecting daily market fluctuations
-- **Different total gain** due to precise vs. averaged prices
-- **Better seasonal patterns** in commodity breakdown
-
-## Deliverables
-1. **Modified flow code** with price table integration
-2. **Comparison report**:
-   - Original gain: $1,673,000
-   - Updated gain: $_______ (document new amount)
-   - Percentage change: _____%
-3. **Price coverage analysis**: How many exchanges used precise vs. fallback pricing
+Document the difference in total gain before/after the pricing update.
 
 ## Success Criteria
-✅ All price tables successfully queried  
-✅ Exchange prices updated with daily rates  
-✅ Fallback handling works for missing prices  
-✅ New total gain calculated and documented  
-✅ Performance remains acceptable (<30 seconds)  
+✅ Exchanges use daily market prices  
+✅ Fallback to original price when needed  
+✅ New total calculated and different from Task 1  
 
-## Next Steps
-With accurate pricing in place, you're ready to expand the data model for serialized items in Task 3.
+The updated pricing should give more realistic profit calculations.

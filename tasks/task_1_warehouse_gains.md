@@ -1,6 +1,7 @@
 # Task 1: The warehouse gain report
 Great! You've conquered the connection-quest and seen those mysterious zeros. Now it's time to turn those zeros into gold...
 
+## Background
 Every warehouse should be able to produce a report summarizing the total value that flowed through it. An "inflow" represents the cost we pay to bring commodities into the warehouse, while an "outflow" represents the money we earn from selling commodities out of the warehouse. The "gain" is the difference between these two numbers and is hopefully positive (but don't worry if it isn't - warehouses have more magic up their sleeves).
 
 ## Objective

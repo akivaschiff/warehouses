@@ -171,53 +171,6 @@ class SupabaseClient:
             logger.error(f"Failed to query {table_name}: {e}")
             return []
 
-    def count(self, table_name: str, filters: Optional[Dict[str, Any]] = None) -> int:
-        """
-        Count records in a table with optional filters
-
-        Args:
-            table_name: Name of the table
-            filters: Optional filters (same format as find())
-
-        Returns:
-            Number of records
-
-        Example:
-            >>> client.count('exchanges', {'item_type': 'Wheat'})
-            8234
-        """
-        try:
-            where_conditions = []
-            params = {}
-
-            if filters:
-                # Reuse filter logic from find()
-                for key, value in filters.items():
-                    if "__" in key:
-                        column, operator = key.split("__", 1)
-                        param_name = f"param_{len(params)}"
-
-                        if operator == "gte":
-                            where_conditions.append(f"{column} >= :{param_name}")
-                            params[param_name] = value
-                        # ... (same logic as find method)
-                    else:
-                        param_name = f"param_{len(params)}"
-                        where_conditions.append(f"{key} = :{param_name}")
-                        params[param_name] = value
-
-            query = f"SELECT COUNT(*) FROM {table_name}"
-            if where_conditions:
-                query += " WHERE " + " AND ".join(where_conditions)
-
-            with self.engine.connect() as conn:
-                result = conn.execute(text(query), params)
-                return result.scalar()
-
-        except SQLAlchemyError as e:
-            logger.error(f"Failed to count {table_name}: {e}")
-            return 0
-
     def get_sample_data(self, table_name: str, n: int = 5) -> List[Dict[str, Any]]:
         return self.find(table_name, limit=n)
 

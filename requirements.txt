@@ -35,5 +35,8 @@ pydantic>=2.0.0
 # Progress bars for long-running tasks
 tqdm>=4.65.0
 
+# Cryptography for file encryption/decryption
+cryptography>=41.0.0
+
 # Supabase integration (optional - using SQLAlchemy for now)
 # supabase>=1.0.0

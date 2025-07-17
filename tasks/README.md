@@ -2,6 +2,23 @@
 
 This folder contains the progressive workshop tasks that build from basic warehouse analysis to sophisticated multi-entity portfolio management.
 
+## Utility Scripts
+
+### 🔐 [File Encryption/Decryption](file_crypto.py)
+**Security Tool**: Encrypt and decrypt files with password protection
+- Encrypt files with password and `.locked` suffix
+- Decrypt files with password and remove `.locked` suffix
+- Uses secure PBKDF2 key derivation and Fernet encryption
+
+**Usage Examples:**
+```bash
+# Encrypt a file
+python tasks/file_crypto.py document.txt mypassword -e
+
+# Decrypt a file  
+python tasks/file_crypto.py document.txt.locked mypassword -d
+```
+
 ## Task Progression
 
 ### 📊 [Task 1: Verify Warehouse Gains Calculation](task_1_verify_warehouse_gains.md)
