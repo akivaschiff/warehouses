@@ -9,7 +9,6 @@ Implement the logic in the function `calculate_warehouse_gains`. The return type
 
 
 ```bash
-# Test flow and connection
 make run-flow
 ```
 
